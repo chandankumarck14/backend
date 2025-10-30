@@ -3,22 +3,13 @@ import cors from "cors";
 import dotenv from "dotenv";
 import favoriteRoutes from "./routes/favoriteRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
-import { PrismaClient } from '@prisma/client';
+
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const prisma = new PrismaClient();
 
-app.get("/test-db", async (req, res) => {
-  try {
-    const users = await prisma.user.findMany();
-    res.json({ success: true, count: users.length });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
 
 // ✅ CORS setup (important for Render)
 app.use(
