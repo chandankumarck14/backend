@@ -9,34 +9,39 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// ✅ CORS Configuration
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://favorite-move-tvshow.vercel.app",
-];
-
+// ✅ Dynamic CORS Setup
 app.use(
   cors({
-    origin: (origin, callback) => {
-      // Allow requests with no origin (like Postman)
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) return callback(null, true);
-      return callback(new Error("CORS not allowed for this origin"));
+    origin: function (origin, callback) {
+      const allowedOrigins = [
+
+        process.env.CORS_ORIGIN // from .env (Render frontend domain)
+      ];
+
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        console.warn(`❌ Blocked by CORS: ${origin}`);
+        callback(new Error("Not allowed by CORS"));
+      }
     },
     credentials: true,
   })
 );
 
-// Middleware
+// ✅ Middleware
 app.use(express.json());
 
-// Routes
+// ✅ Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/favorites", favoriteRoutes);
 
-// Health Check
+// ✅ Health check
 app.get("/health", (req, res) => {
   res.json({ status: "OK", message: "Server is running" });
 });
 
-app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
+// ✅ Start server
+app.listen(PORT, () => {
+  console.log(`✅ Server running on port ${PORT}`);
+});
